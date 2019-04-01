@@ -55,6 +55,31 @@ public class BoardRepositoryTests {
 
     @Test
     public void addDummy(){
-        
+        for( int i = 1; i <=200 ; i++){
+            Board board = new Board();
+            board.setTitle("제목 : "+ i);
+            board.setContent("내용 : "+ i + "채우기");
+            board.setWriter("user0"+ ( i%10 ) );
+            boardRepository.save(board);
+        }
+    }
+
+    @Test
+    public void findByTitleTest(){
+
+        boardRepository.findBoardByTitle("제목 : 1")
+                .forEach(System.out::println);
+
+
+
+    }
+    @Test
+    public void findByWriterTest(){
+
+        boardRepository.findBoardByWriter("user00")
+                .forEach(System.out::println);
+
+
+
     }
 }
