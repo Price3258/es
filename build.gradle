@@ -29,4 +29,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compile 'pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.0'
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch
+    compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '3.1.6.RELEASE'
+
 }

@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "docs")
-public class Document {
+public class Documents {
 
 
     @Id
