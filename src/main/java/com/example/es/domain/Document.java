@@ -4,15 +4,18 @@ package com.example.es.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "document")
+@Table(name = "docs")
 public class Document {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     int namespace;
 
