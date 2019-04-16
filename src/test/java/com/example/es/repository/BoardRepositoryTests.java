@@ -52,8 +52,12 @@ public class BoardRepositoryTests {
 
 
         System.out.println("read test :  " + board.toString() );
-        board.get().setContent("3번째 내용 수정이다 이말이야");
-
+        board.ifPresent(value -> value.setContent("3번째 내용 수정이다 이말이야"));
+        /*
+            if(board.isPresent()) {
+                board.get().setContent("3번째 내용 수정이다 이말이야");
+            }
+         */
         boardRepository.save(board.get());
 
     }

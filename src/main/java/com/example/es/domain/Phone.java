@@ -18,7 +18,7 @@ import javax.persistence.Id;
 public class Phone {
 
     @Id
-    private int id;
+    private Long id;
     private String number;
     private String owner;
 }
