@@ -8,6 +8,12 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 
 import java.util.List;
 
+public interface PhoneRepository  {
+
+
+}
+
+/*
 public interface PhoneRepository extends ElasticsearchRepository<Phone,Long> {
 
 
@@ -15,3 +21,5 @@ public interface PhoneRepository extends ElasticsearchRepository<Phone,Long> {
     List<Phone> findByNumber(String number);
 
 }
+
+ */

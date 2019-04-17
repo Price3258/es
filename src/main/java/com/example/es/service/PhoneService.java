@@ -15,35 +15,5 @@ import java.util.Optional;
 public class PhoneService {
 
 
-    @Autowired
-    PhoneRepository phoneRepository;
-
-
-    public Phone save(Phone phone) {
-        return phoneRepository.save(phone);
-    }
-
-    public void delete(Phone phone) {
-        phoneRepository.delete(phone);
-    }
-
-    public Optional<Phone> findOne(Long id) {
-
-        return phoneRepository.findById(id);
-        
-    }
-
-    public Iterable<Phone> findAll() {
-        return phoneRepository.findAll();
-    }
-
-    public Page<Phone> findByAuthor(String owner, PageRequest pageRequest) {
-        return phoneRepository.findByOwner(owner, pageRequest);
-    }
-
-    public List<Phone> findByNumber(String number) {
-        return phoneRepository.findByNumber(number);
-    }
-
 
 }
