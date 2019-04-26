@@ -10,6 +10,7 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +34,13 @@ public class ElasticSearchAPI {
      */
     public Map<String, Object> callElasticApi(String method, String url, Object obj, String jsonData) {
 
+
         Map<String, Object> result = new HashMap<>();
 
 //        String jsonString;
 //        //json형태의 파라미터가 아니라면 gson으로 만들어주자.
 
-        String jsonString = jsonData;
-
-
+/*
         //엘라스틱서치에서 제공하는 restClient를 통해 엘라스틱서치에 접속한다
         try(RestClient restClient = RestClient.builder(new HttpHost(host, port)).build()) {
 
@@ -54,7 +54,7 @@ public class ElasticSearchAPI {
                 response = restClient.performRequest(method, url, params);
                 System.out.println("2");
             } else {
-                HttpEntity entity = new NStringEntity(jsonString, ContentType.APPLICATION_JSON);
+                HttpEntity entity = new NStringEntity(jsonData, ContentType.APPLICATION_JSON);
                 response = restClient.performRequest(method, url, params, entity);
                 System.out.println("3");
 
@@ -72,6 +72,23 @@ public class ElasticSearchAPI {
             result.put("resultCode", -1);
             result.put("resultBody", e.toString());
         }
+        */
+
+
+        RestClient restClient = RestClient.builder(
+                new HttpHost(host, port, "http")).build();
+
+        try {
+            Response response = restClient.performRequest("GET", "/");
+
+
+            restClient.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
         return result;
 
 
