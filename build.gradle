@@ -32,6 +32,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch
     compile group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '3.0.6.RELEASE'
     compile 'org.elasticsearch.client:elasticsearch-rest-client:5.6.3'
+    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:5.6.16'
 
 
 
