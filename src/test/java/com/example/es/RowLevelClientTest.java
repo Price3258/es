@@ -51,14 +51,14 @@ public class RowLevelClientTest {
 
         Map<String, String> params = Collections.emptyMap();
         String jsonString = "{" +
-                "\"user\":\"kimchy\"," +
+                "\"user\":\"drake\"," +
                 "\"postDate\":\"2013-01-30\"," +
                 "\"message\":\"trying out Elasticsearch\"" +
                 "}";
         HttpEntity entity = new NStringEntity(jsonString, ContentType.APPLICATION_JSON);
 
         try {
-            Response response = restClient.performRequest("PUT", "/posts/doc/1", params, entity);
+            Response response = restClient.performRequest("PUT", "/posts/doc/2", params, entity);
         } catch (IOException e) {
             e.printStackTrace();
         }

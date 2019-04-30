@@ -1,6 +1,11 @@
 package com.example.es;
 
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -26,10 +31,11 @@ public class HighlevelClientTest {
     @Test
     public void test() throws IOException {
 
-        RestClient lowLevelRestClient = RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")).build();
+
 
         RestHighLevelClient client =
-                new RestHighLevelClient(lowLevelRestClient);
+                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")));
+
 
         /*
 
@@ -46,10 +52,10 @@ public class HighlevelClientTest {
         */
 
         Map<String, Object> jsonMap = new HashMap<>();
-        jsonMap.put("user", "kimchy123");
+        jsonMap.put("user", "kimchy12");
         jsonMap.put("postDate", new Date());
         jsonMap.put("message", "trying out Elasticsearch");
-        IndexRequest indexRequest = new IndexRequest("posts", "doc", "1")
+        IndexRequest indexRequest = new IndexRequest("posts", "doc", "2")
                 .source(jsonMap);
 
 
@@ -60,6 +66,101 @@ public class HighlevelClientTest {
 
         System.out.println(index);
 
+        client.close();
 
     }
+
+    @Test
+    public void testGet() throws IOException {
+
+        //RestClient lowLevelRestClient = RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")).build();
+
+        RestHighLevelClient client =
+                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+                ));
+
+
+        GetRequest getRequest = new GetRequest("posts","doc","1");
+
+        GetResponse getResponse = client.get(getRequest);
+
+
+        if(getResponse.isExists()){
+            System.out.println(getResponse.getVersion());
+
+            String sourceAsString = getResponse.getSourceAsString();
+            System.out.println(sourceAsString);
+
+
+            Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
+
+            // can get Map
+
+            byte[] sourceAsBytes = getResponse.getSourceAsBytes();
+            // also byte map
+
+
+
+        }else{
+            client.close();
+        }
+
+        client.close();
+    }
+
+    @Test
+    public void testExists() throws IOException {
+
+        RestHighLevelClient client =
+                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+                ));
+
+        GetRequest getRequest = new GetRequest(
+                "posts",
+                "doc",
+                "1");
+
+
+        boolean exists = client.exists(getRequest);
+
+        System.out.println(exists);
+
+        client.close();
+    }
+
+
+    @Test
+    public void testDelete() throws IOException {
+
+        RestHighLevelClient client =
+                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+                ));
+
+        DeleteRequest request = new DeleteRequest(
+                "posts",
+                "doc",
+                "2");
+
+        request.timeout("3s");
+
+
+        DeleteResponse response = client.delete(request);
+
+
+        String index = response.getIndex();
+        String type = response.getType();
+        String id = response.getId();
+        long version = response.getVersion();
+
+
+
+        System.out.println( response.toString() );
+
+        if(response.getResult() == DocWriteResponse.Result.NOT_FOUND){
+            System.out.println("Doc is not found ");
+        }
+
+        client.close();
+    }
+
 }
