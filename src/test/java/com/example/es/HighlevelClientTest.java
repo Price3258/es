@@ -1,13 +1,20 @@
 package com.example.es;
 
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
@@ -24,17 +31,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class HighlevelClientTest {
+
+    private RestHighLevelClient client =
+            new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+            ));
+
 
     @Test
     public void test() throws IOException {
 
 
 
-        RestHighLevelClient client =
-                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")));
+//        RestHighLevelClient client =
+//                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")));
 
 
         /*
@@ -74,10 +88,10 @@ public class HighlevelClientTest {
     public void testGet() throws IOException {
 
         //RestClient lowLevelRestClient = RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")).build();
-
-        RestHighLevelClient client =
-                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
-                ));
+//
+//        RestHighLevelClient client =
+//                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+//                ));
 
 
         GetRequest getRequest = new GetRequest("posts","doc","1");
@@ -111,9 +125,9 @@ public class HighlevelClientTest {
     @Test
     public void testExists() throws IOException {
 
-        RestHighLevelClient client =
-                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
-                ));
+//        RestHighLevelClient client =
+//                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+//                ));
 
         GetRequest getRequest = new GetRequest(
                 "posts",
@@ -132,9 +146,9 @@ public class HighlevelClientTest {
     @Test
     public void testDelete() throws IOException {
 
-        RestHighLevelClient client =
-                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
-                ));
+//        RestHighLevelClient client =
+////                new RestHighLevelClient(RestClient.builder(new HttpHost("192.168.53.130", 9200, "http")
+////                ));
 
         DeleteRequest request = new DeleteRequest(
                 "posts",
@@ -162,5 +176,76 @@ public class HighlevelClientTest {
 
         client.close();
     }
+
+
+    @Test
+    public void testUpdate() throws IOException{
+
+        /*
+        UpdateRequest request = new UpdateRequest(
+                "posts",
+                "doc",
+                "1");
+        String date = "\"" +LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))+"\"";
+        String jsonString = "{" +
+                "\"updated\":"+ date + ","+
+                "\"reason\":\"daily update\"" +
+                "}";
+        request.doc(jsonString, XContentType.JSON);
+
+        */
+        //Json String 을 이용해 update 하는 법 .
+
+
+        Map<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("updated", new Date());
+        jsonMap.put("reason", "daily update");
+        UpdateRequest request = new UpdateRequest("posts", "doc", "1")
+                .doc(jsonMap).timeout("2s");
+
+
+        UpdateResponse updateResponse = client.update(request, RequestOptions.DEFAULT);
+
+        System.out.println(" response : "+ updateResponse);
+
+        client.close();
+    }
+
+    @Test
+    public void bulkTest() throws IOException {
+
+        BulkRequest request = new BulkRequest();
+
+        request.add(new IndexRequest("posts", "doc", "1")
+                .source(XContentType.JSON,"field", "foo"));
+        request.add(new IndexRequest("posts", "doc", "2")
+                .source(XContentType.JSON,"field", "bar"));
+        request.add(new IndexRequest("posts", "doc", "3")
+                .source(XContentType.JSON,"field", "baz"));
+
+
+        BulkResponse bulkResponse = client.bulk(request, RequestOptions.DEFAULT);
+
+
+        for (BulkItemResponse bulkItemResponse : bulkResponse) {
+            DocWriteResponse itemResponse = bulkItemResponse.getResponse();
+
+            if (bulkItemResponse.getOpType() == DocWriteRequest.OpType.INDEX
+                    || bulkItemResponse.getOpType() == DocWriteRequest.OpType.CREATE) {
+                IndexResponse indexResponse = (IndexResponse) itemResponse;
+
+            } else if (bulkItemResponse.getOpType() == DocWriteRequest.OpType.UPDATE) {
+                UpdateResponse updateResponse = (UpdateResponse) itemResponse;
+
+            } else if (bulkItemResponse.getOpType() == DocWriteRequest.OpType.DELETE) {
+                DeleteResponse deleteResponse = (DeleteResponse) itemResponse;
+            }
+        }
+
+        client.close();
+
+    }
+
+
 
 }
